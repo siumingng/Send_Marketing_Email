@@ -77,17 +77,32 @@ namespace Send_Marketing_Email
 
         private void cmdSend_Click(object sender, RoutedEventArgs e)
         {
-            MailMessage mail = new MailMessage(cboFrom.SelectedValue.ToString(), "siuming@bpohk.com");
             SmtpClient client = new SmtpClient();
             client.Port = 25;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.UseDefaultCredentials = false;
             client.Host = "172.23.4.5";
-            mail.Subject = txtSubject.Text;
-            mail.Body = txtBody.Text;
-            mail.IsBodyHtml = true;
-            client.Send(mail);
-            MessageBox.Show("Done!");
+            using (SqlConnection conn = new SqlConnection(connectionstring))
+            {
+                conn.Open();
+                SqlCommand com = new SqlCommand();
+                com.Connection = conn;
+                com.CommandText = "Select email from " + cboTo.SelectedValue.ToString();
+                SqlDataReader dr = com.ExecuteReader();
+                while (dr.Read())
+                {
+                    MailMessage mail = new MailMessage(cboFrom.SelectedValue.ToString(), dr[0].ToString());
+                    mail.Subject = txtSubject.Text;
+                    mail.Body = txtBody.Text;
+                    mail.IsBodyHtml = true;
+                    client.Send(mail);
+                }
+                dr.Close();
+                MessageBox.Show("Done!");
+            }
+
+            
+            
 
         }
     }
