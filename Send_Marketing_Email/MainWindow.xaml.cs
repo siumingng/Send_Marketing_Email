@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Data.SqlClient;
 using System.Net.Mail;
 
+
 namespace Send_Marketing_Email
 {
     /// <summary>
@@ -22,6 +23,7 @@ namespace Send_Marketing_Email
     /// </summary>
     public partial class MainWindow : Window
     {
+        //connection to Database
         private string connectionstring = "Server = 172.23.4.250; Database=MarketingEmail;User Id = sa;Password=p@ssw0rd;";
         public MainWindow()
         {
@@ -91,14 +93,23 @@ namespace Send_Marketing_Email
                 SqlDataReader dr = com.ExecuteReader();
                 while (dr.Read())
                 {
-                    MailMessage mail = new MailMessage(cboFrom.SelectedValue.ToString(), dr[0].ToString());
-                    mail.Subject = txtSubject.Text;
-                    mail.Body = txtBody.Text;
-                    mail.IsBodyHtml = true;
-                    client.Send(mail);
+                    try
+                    {
+                        MailMessage mail = new MailMessage(cboFrom.SelectedValue.ToString(), dr[0].ToString());
+                        mail.Subject = txtSubject.Text;
+                        mail.Body = txtBody.Text;
+                        mail.IsBodyHtml = true;
+                        mail.Attachments.Add(new Attachment("C:\\Users\\siuming\\Downloads\\Notice.pdf"));
+                        client.Send(mail);
+                    } catch (Exception ex)
+                    {
+
+                    }
+                    
                 }
                 dr.Close();
                 MessageBox.Show("Done!");
+                this.Close();
             }
 
             
